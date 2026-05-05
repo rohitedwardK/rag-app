@@ -2,6 +2,8 @@
 
 This document describes how the RAG demo is structured, how data flows through the system, and where to change behavior.
 
+For a concise agent-oriented orientation (read order, stack, gitignored paths), see [AGENTS.md](./AGENTS.md).
+
 ## Architecture overview
 
 ```mermaid

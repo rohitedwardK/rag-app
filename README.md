@@ -4,6 +4,8 @@ Minimal **Retrieval Augmented Generation** demo: upload documents, embed them in
 
 **Project layout and architecture:** see [PROJECT_MAP.md](./PROJECT_MAP.md).
 
+**AI / agent onboarding:** see [AGENTS.md](./AGENTS.md) (shortcut: [AGENT.md](./AGENT.md)).
+
 ## What you need
 
 | Requirement | Notes |
