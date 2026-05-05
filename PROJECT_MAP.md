@@ -44,7 +44,7 @@ flowchart LR
     DocSvc --> Uploads
   end
 
-  APIsvc -->|HTTP :8000| Main
+  APIsvc -->|/api proxy → :8010| Main
 ```
 
 ## Request flows
@@ -120,7 +120,7 @@ rag-demo/
 | POST | `/scan-and-index` | Scan knowledge dir and index files |
 | DELETE | `/clear-index` | Drop vector index |
 
-Interactive schemas: `http://localhost:8000/docs` when the backend is running.
+Interactive schemas: `http://localhost:8010/docs` when the backend is running (default `API_PORT`; yours may differ).
 
 ## Frontend ↔ backend
 
@@ -130,7 +130,7 @@ The UI uses only a subset of the API (see `frontend/src/app/services/api.service
 - `POST /upload`, `GET /documents`, `DELETE /documents/{filename}`
 - `POST /chat`
 
-The backend URL is hardcoded as `http://localhost:8000`. To point at another host, change `baseUrl` in `api.service.ts` or add environment-based configuration.
+In development, **`ApiService`** uses the same-origin prefix **`/api`**; **`frontend/proxy.conf.js`** forwards to the backend (default `http://127.0.0.1:8010`). Use env **`BACKEND_URL`** when starting `npm start`, or change the proxy target, if the API runs elsewhere.
 
 ## Configuration reference
 

@@ -634,10 +634,25 @@ export class AppComponent implements OnInit {
       },
       error: (err) => {
         this.thinking = false;
-        this.messages.push({
-          role: 'assistant',
-          content: 'Sorry, there was an error processing your request. Please try again.',
-        });
+        const detail = err.error?.detail;
+        let explanation = '';
+        if (typeof detail === 'string') {
+          explanation = detail;
+        } else if (Array.isArray(detail)) {
+          explanation = detail
+            .map((d: { msg?: string }) => d?.msg)
+            .filter(Boolean)
+            .join('; ');
+        } else if (err.status === 0) {
+          explanation =
+            'Network error — is the backend running and is `npm start` using the /api proxy?';
+        } else if (err.status != null) {
+          explanation = `HTTP ${err.status}`;
+        }
+        const content = explanation
+          ? `Sorry, there was an error: ${explanation}`
+          : 'Sorry, there was an error processing your request. Please try again.';
+        this.messages.push({ role: 'assistant', content });
       },
     });
   }

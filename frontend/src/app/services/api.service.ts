@@ -36,7 +36,8 @@ export interface ModelStatusResponse {
   providedIn: 'root',
 })
 export class ApiService {
-  private readonly baseUrl = 'http://localhost:8000';
+  /** Same-origin `/api` in dev (see `frontend/proxy.conf.js`). */
+  private readonly baseUrl = '/api';
 
   constructor(private http: HttpClient) {}
 

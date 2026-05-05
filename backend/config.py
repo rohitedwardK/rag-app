@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     # ChromaDB - uses persistent local storage
     chroma_persist_dir: str = "./chroma_data"
 
+    # HTTP server (uvicorn); 8010 avoids clashing with other local apps on 8000
+    api_port: int = 8010
+
     # File upload
     upload_dir: str = "./uploads"
     max_file_size_mb: int = 10

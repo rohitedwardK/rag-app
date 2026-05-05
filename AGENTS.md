@@ -17,7 +17,8 @@ Local **RAG** demo: upload documents → chunk → embed with **Ollama** → sto
 | Vector DB | Chroma persistent dir `backend/chroma_data/` (local files, not committed) |
 | LLM / embeddings | Ollama HTTP API (default `http://localhost:11434`) |
 | UI | Angular 18 standalone app (`frontend/`), dev server port **4200** |
-| API port | **8000** |
+| API port | **8010** by default (`API_PORT` in `.env`; avoids common **8000** conflicts) |
+| Dev HTTP | Browser calls **`/api/*`**; **`frontend/proxy.conf.js`** forwards to the backend |
 
 ## Suggested read order for code analysis
 
@@ -27,7 +28,7 @@ Local **RAG** demo: upload documents → chunk → embed with **Ollama** → sto
 4. `backend/services/chat_service.py` — retrieve → prompt → LLM response.
 5. `backend/rag/` — `chunker.py`, `embeddings.py`, `vector_store.py`, `retriever.py`, `llm.py`, `prompts.py`.
 6. `frontend/src/app/app.component.ts` — single-component UI (upload, doc list, chat).
-7. `frontend/src/app/services/api.service.ts` — `baseUrl` is `http://localhost:8000` (change here if API host differs).
+7. `frontend/src/app/services/api.service.ts` — dev `baseUrl` is **`/api`** (proxy). For another backend port, set **`BACKEND_URL`** when running `npm start` or edit **`frontend/proxy.conf.js`**.
 
 Optional / advanced:
 
