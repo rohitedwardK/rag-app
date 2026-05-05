@@ -1,148 +1,121 @@
 # RAG Demo
 
-A minimal RAG (Retrieval Augmented Generation) demo with document upload and chat. No Docker required.
+Minimal **Retrieval Augmented Generation** demo: upload documents, embed them into a local vector store, and chat with an LLM grounded on your files. **No Docker required.**
 
-## Features
+**Project layout and architecture:** see [PROJECT_MAP.md](./PROJECT_MAP.md).
 
-- Upload PDF, TXT, or Markdown documents
-- Automatic text extraction, chunking, and embedding
-- Chat interface to ask questions about your documents
-- Local vector storage (ChromaDB embedded mode)
-- Uses Ollama for embeddings and LLM
+## What you need
 
-## Prerequisites
+| Requirement | Notes |
+|-------------|--------|
+| **Python 3.11+** | Backend |
+| **Node.js 18+** | Angular frontend |
+| **Ollama** | Local embeddings + LLM ([ollama.com](https://ollama.com)) |
 
-- Python 3.11+
-- Node.js 18+
-- Ollama running locally
+## How to run (quick path)
 
-## Quick Start
+Run these **three** pieces in order: Ollama → backend → frontend.
 
-### 1. Verify Ollama is Running
+### 1. Ollama
 
 ```bash
-# Check Ollama is running
 ollama list
-
-# Pull required models (if not already)
 ollama pull nomic-embed-text
 ollama pull llama3.2
 ```
 
-### 2. Start the Backend
+Keep the Ollama app/daemon running (default API: `http://localhost:11434`).
+
+### 2. Backend (FastAPI)
+
+**Windows (PowerShell)**
 
 ```powershell
-cd rag-demo/backend
-
-# Create virtual environment
+cd path\to\rag-demo\backend
 python -m venv venv
-
-# Activate virtual environment (Windows)
-.\venv\Scripts\activate
-
-# Install dependencies
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-# Start the server
+copy .env.example .env
 python main.py
 ```
 
-The API will be available at `http://localhost:8000`.
-API docs at `http://localhost:8000/docs`.
+**macOS / Linux**
 
-### 3. Start the Frontend
+```bash
+cd path/to/rag-demo/backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+python main.py
+```
 
-Open a new terminal:
+- API: **http://localhost:8000**
+- Swagger UI: **http://localhost:8000/docs**
 
-```powershell
-cd rag-demo/frontend
+### 3. Frontend (Angular)
 
-# Install dependencies
+**Windows / macOS / Linux**
+
+```bash
+cd path/to/rag-demo/frontend
 npm install
-
-# Start development server
 npm start
 ```
 
-The UI will be available at `http://localhost:4200`.
+- App: **http://localhost:4200**
 
-## Usage
-
-1. Open `http://localhost:4200` in your browser
-2. Upload a document (PDF, TXT, or MD file)
-3. Wait for indexing to complete
-4. Ask questions about your document in the chat
-
-## Project Structure
-
-```
-rag-demo/
-├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── config.py            # Settings
-│   ├── requirements.txt     # Python dependencies
-│   ├── rag/                  # RAG components
-│   │   ├── chunker.py       # Text splitting
-│   │   ├── embeddings.py    # Ollama embeddings
-│   │   ├── llm.py           # Ollama LLM
-│   │   ├── prompts.py       # Prompt templates
-│   │   ├── retriever.py     # Vector search
-│   │   └── vector_store.py  # ChromaDB interface
-│   └── services/
-│       ├── chat_service.py      # Chat with RAG
-│       └── document_service.py  # Document processing
-├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── app.component.ts    # Main UI component
-│   │   │   └── services/
-│   │   │       └── api.service.ts  # HTTP client
-│   │   ├── main.ts
-│   │   └── styles.scss
-│   ├── package.json
-│   └── angular.json
-└── README.md
-```
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Check API status |
-| `/upload` | POST | Upload a document |
-| `/documents` | GET | List all documents |
-| `/documents/{filename}` | DELETE | Delete a document |
-| `/chat` | POST | Send a message |
+Open the UI, confirm the status banner shows the backend and models, then upload a file and use the chat panel.
 
 ## Configuration
 
-Create a `.env` file in `backend/` to customize settings:
+Copy `backend/.env.example` to `backend/.env` and edit as needed:
 
-```env
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_EMBED_MODEL=nomic-embed-text
-OLLAMA_LLM_MODEL=llama3.2
-CHROMA_PERSIST_DIR=./chroma_data
+- **`OLLAMA_*`** — URL and model names (defaults match the pulls above).
+- **`CHROMA_PERSIST_DIR`** — Where Chroma stores vectors (default `./chroma_data`).
+- **`KNOWLEDGE_BASE_DIR`** — Optional folder of markdown docs to index via API (`POST /index-knowledge-base` / `POST /scan-and-index`). See `.env.example` for examples.
+- **`TARGET_APP_SOURCE`**, **`AUTO_GENERATE_DOCS`** — Optional: generate markdown from an Angular `src/app` tree on startup and index it (advanced; see `.env.example`).
+- **`CORS_ORIGINS`** — JSON list of allowed frontend origins if you change ports.
+
+After changing `.env`, restart the backend.
+
+## Optional: generate docs from Angular source (CLI)
+
+From the repo root, with the backend venv activated and dependencies installed:
+
+```bash
+python scripts/generate-docs.py <path-to-angular-src-app> <output-markdown-dir>
 ```
+
+Example:
+
+```bash
+python scripts/generate-docs.py C:/my-app/ui/src/app C:/my-app/docs/auto-generated
+```
+
+You can then point `KNOWLEDGE_BASE_DIR` at that output or index via the backend endpoints described in [PROJECT_MAP.md](./PROJECT_MAP.md).
+
+## Using the app
+
+1. Open **http://localhost:4200**
+2. Upload **PDF, TXT, Markdown, DOCX, HTML, or CSV** (see UI hints)
+3. Wait until indexing finishes
+4. Ask questions in the chat; responses include **source** filenames when available
 
 ## Troubleshooting
 
-### "Cannot connect to backend"
-- Ensure the Python server is running on port 8000
-- Check for CORS errors in browser console
+| Issue | What to check |
+|-------|----------------|
+| UI says it cannot connect | Backend running on port **8000**? Firewall? |
+| Ollama / model errors | `ollama list`, models pulled, `OLLAMA_BASE_URL` in `.env` |
+| CORS in browser console | Add your frontend URL to `CORS_ORIGINS` in `.env` |
+| Empty text from a PDF | Prefer text-based PDFs; scanned images need OCR elsewhere |
+| Wrong API host from frontend | `baseUrl` in `frontend/src/app/services/api.service.ts` is **http://localhost:8000** |
 
-### "Ollama connection error"
-- Verify Ollama is running: `ollama list`
-- Check the Ollama URL in config
+## API summary
 
-### "No text extracted from document"
-- PDF must contain text (not just images)
-- Try a different file format
+Full table: [PROJECT_MAP.md](./PROJECT_MAP.md). Common endpoints: `GET /health`, `POST /upload`, `GET /documents`, `DELETE /documents/{filename}`, `POST /chat`.
 
-## Next Steps
+## Repository
 
-Once this works, you can expand to:
-- URL crawling
-- Multi-user/project support
-- PostgreSQL for metadata
-- Improved chunking strategies
+Public mirror: [github.com/rohitedwardK/rag-app](https://github.com/rohitedwardK/rag-app).
