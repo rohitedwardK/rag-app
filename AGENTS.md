@@ -1,5 +1,7 @@
 # Agents guide
 
+This repository uses **`AGENTS.md`** only (common Cursor convention at the repo root). Do not add a duplicate `AGENT.md`; keep onboarding here.
+
 Use this file as **first-pass context** when analyzing or changing this repository. For deeper diagrams and API tables, read [PROJECT_MAP.md](./PROJECT_MAP.md). For setup and commands, read [README.md](./README.md).
 
 ## What this project is
